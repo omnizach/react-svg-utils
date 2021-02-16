@@ -1,10 +1,18 @@
 import React from 'react'
-
-import { ExampleComponent } from 'react-svg-utils'
 import 'react-svg-utils/dist/index.css'
 
+import { WithFluidExampleContainer } from './WithFluidExample'
+import { WithDataLifecycleContainer } from './WithDataLifecycleExample'
+import { WithOverlayExample } from './WithOverlayExample'
+
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  return (
+    <div>
+      <WithFluidExampleContainer />
+      <WithDataLifecycleContainer />
+      <WithOverlayExample />
+    </div>
+  )
 }
 
 export default App
