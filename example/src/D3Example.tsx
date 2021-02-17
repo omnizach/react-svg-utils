@@ -33,15 +33,17 @@ class D3ExampleComponent extends React.Component<Props & DataProp> {
         .data(data)
         .enter()
           .append('circle')
+          .attr('class', 'point')
           .attr('cx', (d:any) => d[0])
           .attr('cy', (d:any) => d[1])
           .attr('r', 3)
 
     this.selections.lines
-        .selectAll('.lines')
+        .selectAll('.line')
         .data(d3.pairs(data))
         .enter()
           .append('line')
+          .attr('class', 'line')
           .attr('x1', (d:any) => d[0][0])
           .attr('y1', (d:any) => d[0][1])
           .attr('x2', (d:any) => d[1][0])
