@@ -88,13 +88,7 @@ export const withOverlay = () =>
               position: 'relative'
             }}
           >
-            <div
-              style={{
-                position: 'absolute',
-                left: '0px',
-                top: '0px'
-              }}
-            >
+            <div>
               <WrappedComponent 
                 {...this.props}
                 overlay={this.state.prop} 

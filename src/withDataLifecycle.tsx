@@ -1,8 +1,7 @@
 import * as React from 'react'
 
 export interface DataProp<T = any> {
-  data: T
-  element?: HTMLElement
+  data?: T
 }
 
 interface ExternalProps<T = any> {
