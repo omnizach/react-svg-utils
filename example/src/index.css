@@ -12,3 +12,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.point {
+  stroke: none;
+}
+
+.point-in {
+  fill: #33f;
+}
+
+.point-out {
+  fill: #f33;
+}
