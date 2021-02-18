@@ -5,6 +5,7 @@ export interface FluidSvgProps {
   width?: number | string,
   height?: number | string,
   viewBox?: string,
+  preserveNativeCoordinates?: boolean,
   snapWidths?: number[] | false | null,
   setHeight?: (newSize: [number, number]) => number,
   onResize?: (newSize: [number, number]) => void,
@@ -27,6 +28,7 @@ export const FluidSvg =
     width = 300, 
     height = 150, 
     viewBox, // removed if supplied
+    preserveNativeCoordinates = false,
     snapWidths = [180, 360, 540, 720, 960, 1140, 1540, 1860, 2500],
     setHeight,
     onResize,
@@ -38,8 +40,6 @@ export const FluidSvg =
           [size, setSize] = useState<[number, number]>([+width, +height])
 
     const onResizeHandler = useCallback(throttle(() => {
-      console.log('resize', Date.now())
-
       const boundedWidth = svgRef?.current?.parentElement?.getBoundingClientRect()?.width || size[0]
 
       let newSize: [number, number]
@@ -58,12 +58,17 @@ export const FluidSvg =
       if (onResize) {
         onResize(newSize)
       }
-    }, 250), [])
+    }, 250), [size, width, snapWidths, setHeight, onResize])
 
+    // Subscribe to the window resize event using a callback that will remain static
+    // so that unsubscribe will work properly. The above handler gets regenerated
+    // whenever one of the properties changes, and then unsubscribe won't work,
+    // resulting in a memory leak.
+    const staticResizeHandler = useCallback(() => onResizeHandler(), [])
     useLayoutEffect(() => {
-      window.addEventListener('resize', onResizeHandler)
-      onResizeHandler()
-      return () => window.removeEventListener('resize', onResizeHandler)
+      window.addEventListener('resize', staticResizeHandler)
+      staticResizeHandler()
+      return () => window.removeEventListener('resize', staticResizeHandler)
     }, [])
 
     return (
@@ -71,7 +76,7 @@ export const FluidSvg =
         ref={svgRef}
         width={size[0]}
         height={size[1]}
-        viewBox={`0 0 ${width} ${height}`}
+        viewBox={preserveNativeCoordinates ? undefined : `0 0 ${width} ${height}`}
         {...rest}
       >
         {children}

@@ -10,7 +10,7 @@ export const FluidSvgExample = () => {
   const [size, setSize] = useState([400, 200])
 
   return (
-    <FluidSvg width="400" height="200" onResize={setSize}>
+    <FluidSvg width="400" height="200" onResize={setSize} preserveNativeCoordinates>
       <rect fill="#99f" stroke="#000" strokeWidth="5" width="100%" height="100%" />
       <text 
         textAnchor="middle" 
