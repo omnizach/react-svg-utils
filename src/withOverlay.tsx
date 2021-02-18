@@ -1,118 +1,63 @@
-import * as React from 'react'
+import React, { ComponentClass, FunctionComponent, useCallback, useState, useRef, ReactElement, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 export interface Overlay {
   setPosition: (position: [number, number]) => void,
-  renderOverlay: (component: React.ReactElement) => void,
-  clearOverlay: () => void
+  renderOverlay: (element: ReactElement | null) => void
 }
 
 export interface OverlayProp {
   overlay: Overlay
 }
 
-interface ExternalProps {
-  
-}
-
-interface State {
-  style: {
-    left: string,
-    top: string
-  },
-  prop: Overlay
-}
-
-export const withOverlay = () => 
+export const withOverlay = () =>
   <TOriginalProps extends {}>(
-    WrappedComponent: (React.ComponentClass<TOriginalProps & OverlayProp> | React.StatelessComponent<TOriginalProps & OverlayProp>)
-  ) => {
+    WrappedComponent: (ComponentClass<TOriginalProps & OverlayProp> | FunctionComponent<TOriginalProps & OverlayProp>)
+  ) => (props: TOriginalProps) => {
+    
+    const overlayRef = useRef<HTMLDivElement>(null)
 
-    type ResultProps = TOriginalProps & ExternalProps
+    const [position, setPosition] = useState([0, 0])
 
-    const result = class WithOverlay extends React.Component<ResultProps, State> {
+    const setPositionHandler = useCallback((pos: [number, number]) => {
+      setPosition(pos)
+    }, [])
 
-      static displayName = `withOverlay(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`
-
-      constructor(props: ResultProps) {
-        super(props)
-
-        this.overlayRef = React.createRef()
-
-        this.state = {
-          style: {
-            left:'0px',
-            top: '0px'
-          },
-          prop: {
-            setPosition: this.setPosition,
-            renderOverlay: this.renderOverlay,
-            clearOverlay: this.clearOverlay
-          }
-        }
+    const renderOverlay = useCallback((element: ReactElement | null) => {
+      if (overlayRef.current) {
+        ReactDOM.render(element || <div />, overlayRef.current)
       }
+    }, [])
 
-      overlayRef: React.RefObject<HTMLDivElement>
-
-      componentWillUnmount() {
-        if (this?.overlayRef?.current) {
-          ReactDOM.unmountComponentAtNode(this.overlayRef.current)
-        }
+    // clean up the overlay on unmount.
+    useEffect(() => () => {
+      if (overlayRef.current) {
+        ReactDOM.unmountComponentAtNode(overlayRef.current)
       }
+    }, [])
 
-      clearOverlay = () => {
-        this.renderOverlay(
-          <div />
-        )
-      }
-
-      renderOverlay = (element: React.ReactElement) => {
-        if (this?.overlayRef?.current) {
-          ReactDOM.render(element, this.overlayRef.current)
-        }
-      }
-
-      setPosition = (position: [number, number]) => {
-        this.setState({
-          style: {
-            left: `${position[0]+5}px`,
-            top:  `${position[1]+5}px`
-          }
-        })
-      }
-
-      render(): JSX.Element {
-        return (
-          <div 
-            style={{
-              position: 'relative'
-            }}
-          >
-            <div>
-              <WrappedComponent 
-                {...this.props}
-                overlay={this.state.prop} 
-              />
-            </div>
-            <div
-              ref={this.overlayRef}
-              style={{
-                position: 'absolute',
-                zIndex: 1000,
-                left: this.state.style.left,
-                top: this.state.style.top
-              }}
-            />
-          </div>
-        )
-      }
-    }
-
-    return result
-
-    //const enhanced = React.forwardRef((props, ref) => {
-    //  return <WithOverlay {...props} forwardedRef={ref} />
-    //})
-
-    //return enhanced
+    return (
+      <div 
+        style={{
+          position: 'relative'
+        }}
+      >
+        <WrappedComponent 
+          {...props}
+          overlay={{
+            setPosition: setPositionHandler,
+            renderOverlay
+          }}
+        />
+        <div
+          ref={overlayRef}
+          style={{
+            position: 'absolute',
+            zIndex: 1000,
+            left: `${position[0]}px`,
+            top: `${position[1]}px`
+          }}
+        />
+      </div>
+    )
   }

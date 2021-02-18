@@ -27,7 +27,7 @@ class WithOverlayExampleComponent extends Component<Props & OverlayProp> {
           borderRadius: '5px',
           padding: '3px'
         }}
-        onClick={() => this.props.overlay.clearOverlay()}
+        onClick={() => this.props.overlay.renderOverlay(null)}
       >
         You clicked at ({position[0]},{position[1]})
       </div>
