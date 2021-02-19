@@ -6,7 +6,7 @@ import 'react-svg-utils/dist/index.css'
 import { WithOverlayExample } from './WithOverlayExample'
 //import { D3Example } from './D3Example'
 //import { MonteCarloPi } from './MonteCarloPi'
-//import { MonteCarloPi } from './HookExperiment'
+import { MonteCarloPi } from './HookExperiment'
 import { FluidSvgExample } from './FluidSvgExample'
 
 const App = () => {
@@ -16,10 +16,11 @@ const App = () => {
       <WithFluidExampleContainer />
       <WithDataLifecycleContainer />
       <D3Example />
-      <MonteCarloPi />
+      
       <FluidSvgExample />
-      */}
       <WithOverlayExample />
+      */}
+      <MonteCarloPi />
     </div>
   )
 }

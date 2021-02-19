@@ -1,51 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react'
 import * as d3 from 'd3'
 import { throttle } from 'lodash'
+import { useToggleEffect, useConditionalEffect } from 'react-svg-utils'
 
-//const MonteCarlo = ({ data: number, updateCount: (countIn: number, countOut: number) => void }) => {
 const MonteCarlo = ({ data, updateCount }: 
                     { 
                       data: number | null, 
                       updateCount: (counts: { countIn: number, countOut: number }) => void 
                     }) => {
   const svg = useRef<SVGSVGElement>(null),
-        didInit = useRef(false),
-        context = useRef<any>({})
+        { current: ctx } = useRef<any>({})
 
-  useEffect(() => {
-    // init
-    if (!didInit.current && data !== null) {
-      context.current.points = d3.select(svg.current).select('.points')
-      context.current.countIn = 0
-      context.current.countOut = 0
+  // init and clear
+  useToggleEffect(() => data !== null, () => {
+    ctx.points = d3.select(svg.current).select('.points')
+    ctx.countIn = 0
+    ctx.countOut = 0
 
-      didInit.current = true
+    console.log('init')
+
+    return () => {
+      console.log('clear')
+      ctx.countIn = 0
+      ctx.countOut = 0
     }
-
-    // clear
-    if (didInit.current && data === null) {
-      context.current = {}
-      didInit.current = false
-    }
-  }, [didInit, data])
+  }, [data])
 
   // draw
-  useEffect(() => {
-    console.log(data)
-    if (data === null) {
-      return
-    }
+  useConditionalEffect(() => data !== null, () => {
+    console.log('draw', data)
+
     const pointIsIn = (p: [number, number]) => p[0]**2 + (500-p[1])**2 <= 500*500,
           update = throttle(updateCount, 20)
 
-    context.current.points.selectAll("*").interrupt()
-    context.current.countIn = 0
-    context.current.countOut = 0
+    ctx.points.selectAll("*").interrupt()
+    ctx.countIn = 0
+    ctx.countOut = 0
 
-    context.current.points.selectAll('.point').remove()
-    context.current.points
+    ctx.points.selectAll('.point').remove()
+    ctx.points
         .selectAll('.point')
-        .data(d3.range(data).map(() => [Math.random()*500,Math.random()*500]))
+        .data(d3.range(data || 0).map(() => [Math.random()*500,Math.random()*500]))
         .enter()
         .append('circle')
           .attr('class', (d:[number, number]) => pointIsIn(d) ? 'point point-in' : 'point point-out')
@@ -58,13 +53,13 @@ const MonteCarlo = ({ data, updateCount }:
           .attr('opacity', 1)
           .on('end', (d: [number, number], i:number) => {
             if (pointIsIn(d)) {
-              context.current.countIn++
+              ctx.countIn++
             } else {
-              context.current.countOut++
+              ctx.countOut++
             }
             update({
-                    countIn: context.current.countIn, 
-                    countOut: context.current.countOut
+                    countIn: ctx.countIn, 
+                    countOut: ctx.countOut
                   })
           })
   }, [data, updateCount])
