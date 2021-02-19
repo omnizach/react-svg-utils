@@ -46,7 +46,7 @@ interface State {
  * component, it overrides this behavior.
  */
 export const withDataLifecycle = () => <TOriginalProps extends {}, TData>(
-    Component: React.ComponentClass<TOriginalProps & DataProp<TData>> | React.StatelessComponent<TOriginalProps & DataProp<TData>>
+    Component: React.ComponentClass<TOriginalProps & DataProp<TData>> | React.FunctionComponent<TOriginalProps & DataProp<TData>>
   ) => {
   type ResultProps = TOriginalProps & ExternalProps<TData>
 
