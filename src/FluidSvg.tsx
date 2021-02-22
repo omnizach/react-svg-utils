@@ -7,7 +7,7 @@ export interface FluidSvgProps {
   viewBox?: string,
   preserveNativeCoordinates?: boolean,
   snapWidths?: number[] | false | null,
-  setHeight?: (newSize: [number, number]) => number,
+  setHeight?: ((newSize: [number, number]) => number) | 'proportional' | 'static' | 'container',
   onResize?: (newSize: [number, number]) => void,
   children?: React.ReactNode
 }
@@ -30,7 +30,7 @@ export const FluidSvg =
     viewBox, // removed if supplied
     preserveNativeCoordinates = false,
     snapWidths = [180, 360, 540, 720, 960, 1140, 1540, 1860, 2500],
-    setHeight,
+    setHeight = 'proportional',
     onResize,
     children,
     ...rest 
@@ -42,16 +42,24 @@ export const FluidSvg =
     const onResizeHandler = useCallback(throttle(() => {
       const boundedWidth = svgRef?.current?.parentElement?.getBoundingClientRect()?.width || size[0]
 
-      let newSize: [number, number]
+      let newSize: [number, number] = [size[0], size[1]]
       if (!snapWidths) {
-        newSize = [boundedWidth, boundedWidth / (size[0] / size[1])]
+        newSize[0] = boundedWidth
       } else {
         const snappedWidth = max(snapWidths.filter(d => d <= boundedWidth)) || snapWidths[0] || +width
-        newSize = [snappedWidth, snappedWidth / (size[0] / size[1])]
+        newSize[0] = snappedWidth
       }
 
-      if (setHeight) {
-        newSize = [newSize[0], setHeight(newSize)]
+      switch(setHeight) {
+        case 'static': newSize[1] = size[1]; break
+        case 'proportional': newSize[1] = newSize[0] / (size[0] / size[1]); break
+        case 'container': newSize[1] = svgRef?.current?.parentElement?.getBoundingClientRect()?.height || size[1]; break
+        default:
+          if (typeof(setHeight) !== 'function') {
+            console.warn('setHeight option is not valid')     
+          } else {
+            newSize[1] = setHeight([newSize[0], newSize[0] / (size[0] / size[1])])
+          }
       }
 
       setSize(newSize)
