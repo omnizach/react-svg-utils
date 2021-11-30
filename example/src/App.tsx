@@ -8,6 +8,7 @@ import { WithOverlayExample } from './WithOverlayExample'
 //import { MonteCarloPi } from './MonteCarloPi'
 import { MonteCarloPi } from './HookExperiment'
 import { FluidSvgExample } from './FluidSvgExample'
+import { UseDataLifecycleContainer } from './UseDataLifecycleExample'
 
 const App = () => {
   return (
@@ -19,8 +20,10 @@ const App = () => {
       
       <FluidSvgExample />
       <WithOverlayExample />
-      */}
+
       <MonteCarloPi />
+      */}
+      <UseDataLifecycleContainer />
     </div>
   )
 }

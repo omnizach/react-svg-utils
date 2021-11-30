@@ -2,6 +2,7 @@
   "name": "react-svg-utils",
   "version": "1.0.2",
   "description": "Utility functions for creating SVG-based components in ReactJS.",
+  "keywords": ["D3", "SVG", "React"],
   "author": "omnizach",
   "license": "MIT",
   "repository": "omnizach/react-svg-utils",
